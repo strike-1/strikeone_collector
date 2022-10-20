@@ -1,6 +1,4 @@
 import argparse
-import configparser
-import os
 from typing import List
 
 from run_openvas import execute_gvm_scan

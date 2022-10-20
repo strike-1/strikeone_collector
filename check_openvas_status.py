@@ -4,10 +4,8 @@ import os
 import configparser
 
 from gvm.connections import TLSConnection
-from gvm.errors import GvmError
 from gvm.protocols.latest import Gmp
 from gvm.transforms import EtreeCheckCommandTransform
-from gvm.xml import pretty_print
 
 from colorama import Fore
 

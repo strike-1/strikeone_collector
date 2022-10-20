@@ -5,18 +5,10 @@ import configparser
 import json
 
 from gvm.connections import TLSConnection
-from gvm.errors import GvmError
 from gvm.protocols.latest import Gmp
 from gvm.transforms import EtreeCheckCommandTransform
-from gvm.xml import pretty_print
 
 from colorama import Fore
-from datetime import datetime, date
-from pymongo import MongoClient
-from bson import ObjectId
-
-import firebase_admin
-from firebase_admin import credentials, firestore
 
 os.chdir("/opt/scanone/vuln-management/")
 config_file = configparser.ConfigParser()
