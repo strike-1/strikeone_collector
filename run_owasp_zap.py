@@ -35,7 +35,7 @@ def execute_owasp_scan(target: str, userId: str, testId: str):
         if not check_dir:
             print("User directory doesn't exist, creating")
 
-            md_cmd = f"mkdir -p /opt/scanone/vuln-management/reports/owasp_zap/{userId}"
+            md_cmd = f"sudo mkdir -p /opt/scanone/vuln-management/reports/owasp_zap/{userId}"
             md_p = subprocess.Popen(md_cmd, stdout=subprocess.PIPE, shell=True)
             md_p.communicate()
 
