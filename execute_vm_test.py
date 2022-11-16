@@ -23,6 +23,10 @@ def main(userId: str, tool: str, testId: str, urls: List[str], dep_check_data: O
                 if url.find("https://") != -1:
                     targetToScan = targetToScan.split("https://")[1]
 
+                if targetToScan.endswith("/"):
+                    targetToScan = targetToScan[:-1]
+
+
                 result = execute_gvm_scan(str(targetToScan), userId, testId)
                 gvmResults.append(result)
 
