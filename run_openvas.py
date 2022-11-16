@@ -42,7 +42,17 @@ def execute_gvm_scan(target: str, userId: str, testId: str):
         print(f"Target to scan - {target}")
 
         # CREATE TARGET IF NOT EXIST
-        targetId = create_target(gmp, target)
+        target_to_scan = target
+        if target.find("http://") != -1:
+            target_to_scan = target_to_scan.replace("http://", "")
+
+        if target.find("https://") != -1:
+            target_to_scan = target_to_scan.replace("https://", "")
+
+        if target_to_scan.endswith("/"):
+            target_to_scan = target_to_scan[:-1]
+
+        targetId = create_target(gmp, target_to_scan)
 
         # CREATE TASK AND START SCAN
         task = create_task(gmp, testId, targetId)

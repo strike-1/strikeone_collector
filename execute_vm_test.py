@@ -15,19 +15,8 @@ def main(userId: str, tool: str, testId: str, urls: List[str], dep_check_data: O
             gvmResults = list()
 
             for url in urls:
-                targetToScan = url
 
-                if url.find("http://") != -1:
-                    targetToScan = targetToScan.split("http://")[1]
-
-                if url.find("https://") != -1:
-                    targetToScan = targetToScan.split("https://")[1]
-
-                if targetToScan.endswith("/"):
-                    targetToScan = targetToScan[:-1]
-
-
-                result = execute_gvm_scan(str(targetToScan), userId, testId)
+                result = execute_gvm_scan(str(url), userId, testId)
                 gvmResults.append(result)
 
             return gvmResults
