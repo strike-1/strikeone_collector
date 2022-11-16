@@ -39,6 +39,8 @@ def execute_gvm_scan(target: str, userId: str, testId: str):
         version = gmp.get_version()
         print(f"Greenbone OS | Openvas v{ version.find('version').text }")
 
+        print(f"Target to scan - {target}")
+
         # CREATE TARGET IF NOT EXIST
         targetId = create_target(gmp, target)
 
