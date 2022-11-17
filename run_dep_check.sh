@@ -90,9 +90,9 @@ if [ ! -d "${PWD}/$folder" ]; then
 fi 
 cd ./"$folder"
 
-# run npm to install modules
-echo "Running npm install..."
-npm install
+# run yarn to install modules
+echo "Running yarn..."
+yarn
 
 DC_PROJECT="$folder"
 
