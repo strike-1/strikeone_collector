@@ -4,8 +4,9 @@ import subprocess
 
 from run_openvas import execute_gvm_scan
 from run_owasp_zap import execute_owasp_scan
+from run_nuclei import execute_nuclei
 
-def main(userId: str, tool: str, testId: str, urls: List[str], dep_check_data: Optional[dict]):
+def main(userId: str, tool: str, testId: str, urls: List[str], dep_check_data: Optional[dict], nuclei_data: Optional[dict]):
 
     try:
 
@@ -50,6 +51,16 @@ def main(userId: str, tool: str, testId: str, urls: List[str], dep_check_data: O
 
             return res
 
+        if tool == 'nuclei':
+
+            for url in urls:
+                list_scan = open("nuclei_scan_list.txt", 'a')
+                list_scan.write(f"{url}\n")
+                list_scan.close()
+
+            result = execute_nuclei(userId, testId, nuclei_data['templates'])
+            return result
+
     except BaseException as err:
         print('Error occurred during test!\n', err)
         raise err
@@ -60,13 +71,16 @@ if __name__ == "__main__":
     parser.add_argument("-uid", "--userid", help = "user mongo id", required = "true")
     parser.add_argument("-t", "--tool", help = "tool to use", required = "true")
     parser.add_argument("-d", "-tid", "--testid", help = "testid for report filename", required = "true")
-    parser.add_argument("-u", "--urls", help = "urls to scan", nargs='+')
+    parser.add_argument("-u", "--urls", help = "urls to scan", nargs='+', required = "true")
 
     # DEPENDENCY CHECK 
     parser.add_argument("-dcpr", "--dcprojectrepo", help = "project repo for dependency check scan")
     parser.add_argument("-dcpl", "--dcplatform", help = "platform for dependency check scan")
     parser.add_argument("-dcur", "--dcuserrepo", help = "user repo for dependency check scan")
     parser.add_argument("-dctk", "--dctoken", help = "token for dependency check scan")
+
+    # NUCLEI
+    parser.add_argument("-nts", "--nucleitemplates", help = "nuclei templates to use", nargs='+')
 
     args = parser.parse_args()
 
@@ -76,5 +90,9 @@ if __name__ == "__main__":
         "user_repo": args.dcuserrepo,
         "token": args.dctoken,
     }
+
+    nuclei_data = {
+        "templates": args.nucleitemplates
+    }
     # EXECUTE SCRIPT
-    main(args.userid, args.tool, args.testid, args.urls, dep_check_data)
+    main(args.userid, args.tool, args.testid, args.urls, dep_check_data, nuclei_data)
