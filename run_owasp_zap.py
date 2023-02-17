@@ -20,14 +20,14 @@ def execute_owasp_scan(target: str, userId: str, testId: str):
         print("Running Docker command...")
 
         command = f"sudo docker run --rm -v $PWD:/zap/wrk owasp/zap2docker-stable:latest zap-baseline.py -t {target} -J {filename}"    
-        p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True, cwd="/home/ubuntu")
+        p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True, cwd="/home")
         res = p.communicate()
         print (res)
 
         # json result is saved, new pending scan is created in database
         print("Copying results")
 
-        result = open(f"/home/ubuntu/{filename}")
+        result = open(f"/home/{filename}")
         owasp_result = copy.deepcopy(json.load(result))
 
         # check if user has scans directory and move json result there
@@ -39,7 +39,7 @@ def execute_owasp_scan(target: str, userId: str, testId: str):
             md_p = subprocess.Popen(md_cmd, stdout=subprocess.PIPE, shell=True)
             md_p.communicate()
 
-        shutil.move(f"/home/ubuntu/{filename}", f"/opt/scanone/vuln-management/reports/owasp_zap/{userId}/{filename}")
+        shutil.move(f"/home/{filename}", f"/opt/scanone/vuln-management/reports/owasp_zap/{userId}/{filename}")
 
         # update vulnerabilities with _id field
         for site in owasp_result['site']:
