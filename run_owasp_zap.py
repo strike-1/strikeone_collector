@@ -19,7 +19,7 @@ def execute_owasp_scan(target: str, userId: str, testId: str):
 
         print("Running Docker command...")
 
-        command = f"sudo docker run --rm -v $PWD:/zap/wrk owasp/zap2docker-stable:latest zap-baseline.py -t {target} -J {filename}"    
+        command = f"sudo docker run --rm -u root -v $PWD:/zap/wrk owasp/zap2docker-stable:latest zap-baseline.py -t {target} -J {filename}"    
         p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True, cwd="/opt/scanone/vuln-management")
         res = p.communicate()
         print (res)
