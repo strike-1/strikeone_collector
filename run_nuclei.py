@@ -4,7 +4,7 @@ import json
 from typing import Union
 
 def execute_nuclei(userId: str, testId: str, templates: Union[str, None]):
-    print(f"Running Nuclei with {templates if templates is not None else 'no templates. Using nuclei-templates instead'}.")
+    print(f"Running Nuclei with {templates if templates is not None else 'no templates. Using /root/nuclei-templates instead'}.")
 
     check_dir = os.path.isdir(f"/opt/scanone/vuln-management/reports/nuclei/{userId}")
     if not check_dir:
@@ -22,7 +22,7 @@ def execute_nuclei(userId: str, testId: str, templates: Union[str, None]):
    
     cwd = os.getcwd()
 
-    cmd  = f"sudo -E nuclei -l {cwd}/nuclei_scan_list.txt -t {templates if templates is not None else 'nuclei-templates'} -json -silent -o {nuclei_file}"
+    cmd  = f"sudo -E nuclei -l {cwd}/nuclei_scan_list.txt -t {templates if templates is not None else '/root/nuclei-templates'} -json -silent -o {nuclei_file}"
     p = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, cwd=f"/opt/scanone/vuln-management/reports/nuclei/{userId}" )
     results = p.communicate()[0].decode().split('\n')
 
