@@ -4,7 +4,7 @@ import json
 from typing import Union
 
 def execute_nuclei(userId: str, testId: str, templates: Union[str, None]):
-    print('Running Nuclei...')
+    print(f"Running Nuclei with {templates if templates is not None else 'no templates. Using nuclei-templates instead'}.")
 
     check_dir = os.path.isdir(f"/opt/scanone/vuln-management/reports/nuclei/{userId}")
     if not check_dir:
