@@ -1,0 +1,37 @@
+env:
+  contexts:
+  - excludePaths: []
+    name: baseline
+    urls:
+    - https://strikeone.io
+  parameters:
+    failOnError: true
+    progressToStdout: false
+jobs:
+- install:
+  - pscanrulesBeta
+  type: addOns
+  uninstall: []
+- parameters:
+    enableTags: false
+    maxAlertsPerRule: 10
+  type: passiveScan-config
+- parameters:
+    maxDuration: 1
+    url: https://strikeone.io
+  type: spider
+- parameters:
+    maxDuration: 0
+  type: passiveScan-wait
+- parameters:
+    format: Long
+    summaryFile: /home/zap/zap_out.json
+  rules: []
+  type: outputSummary
+- parameters:
+    reportDescription: ''
+    reportDir: /zap/wrk/
+    reportFile: report-strikeone.io-63f4cb74c809c62dd2783669.json
+    reportTitle: ZAP Scanning Report
+    template: traditional-json
+  type: report

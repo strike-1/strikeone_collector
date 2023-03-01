@@ -32,19 +32,14 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
             return owaspResults
         
         if tool == 'dep_check':
-            if 'project_repo' not in tool_data or tool_data['project_repo'] is None:
-                raise ValueError("project_repo field doesn't exist.")
+            if 'project_url' not in tool_data or tool_data['project_url'] is None:
+                raise ValueError("project_url field doesn't exist.")
             
-            if 'platform' not in tool_data or tool_data['platform'] is None:
-                raise ValueError("platform field doesn't exist.")
+            if 'project_name' not in tool_data or tool_data['project_name'] is None:
+                raise ValueError("project_name field doesn't exist.")
+            
 
-            if 'user_repo' not in tool_data or tool_data['user_repo'] is None:
-                raise ValueError("user_repo field doesn't exist.")
-
-            if 'token' not in tool_data or tool_data['token'] is None:
-                raise ValueError("token field doesn't exist.")
-
-            command = f"sudo sh run_dep_check.sh {tool_data['project_repo']} {tool_data['platform']} {tool_data['user_repo']} {tool_data['token']} {userId} {testId}"    
+            command = f"sudo sh run_dep_check.sh {tool_data['project_url']} {tool_data['project_name']} {userId} {testId}"    
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             res = p.communicate()
             print (res)
@@ -62,19 +57,14 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
             return result
 
         if tool == 'gitleaks':
-            if 'project_repo' not in tool_data or tool_data['project_repo'] is None:
-                raise ValueError("project_repo field doesn't exist.")
+            if 'project_url' not in tool_data or tool_data['project_url'] is None:
+                raise ValueError("project_url field doesn't exist.")
             
-            if 'platform' not in tool_data or tool_data['platform'] is None:
-                raise ValueError("platform field doesn't exist.")
+            if 'project_name' not in tool_data or tool_data['project_name'] is None:
+                raise ValueError("project_name field doesn't exist.")
+            
 
-            if 'user_repo' not in tool_data or tool_data['user_repo'] is None:
-                raise ValueError("user_repo field doesn't exist.")
-
-            if 'token' not in tool_data or tool_data['token'] is None:
-                raise ValueError("token field doesn't exist.")
-
-            command = f"sudo sh run_gitleaks.sh {tool_data['project_repo']} {tool_data['platform']} {tool_data['user_repo']} {tool_data['token']} {userId} {testId}"    
+            command = f"sudo sh run_gitleaks.sh {tool_data['project_url']} {tool_data['project_name']} {userId} {testId}"    
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             res = p.communicate()
             return res
@@ -92,10 +82,8 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--urls", help = "urls to scan", nargs='+', required = "true")
 
     # DEPENDENCY CHECK, GIT LEAKS
-    parser.add_argument("-pr", "--dcprojectrepo", help = "project repo for dependency check scan")
-    parser.add_argument("-pl", "--dcplatform", help = "platform for dependency check scan")
-    parser.add_argument("-ur", "--dcuserrepo", help = "user repo for dependency check scan")
-    parser.add_argument("-tk", "--dctoken", help = "token for dependency check scan")
+    parser.add_argument("-pu", "--projecturl", help = "project/repo url to clone")
+    parser.add_argument("-pn", "--projectname", help = "project/repo name, needed to read repo contents")
 
     # NUCLEI
     parser.add_argument("-nts", "--nucleitemplates", help = "nuclei templates to use")
@@ -103,10 +91,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     tool_data = {
-        "project_repo": args.dcprojectrepo,
-        "platform": args.dcplatform,
-        "user_repo": args.dcuserrepo,
-        "token": args.dctoken,
+        "project_url": args.projecturl,
+        "project_name": args.projectname,
         "templates": args.nucleitemplates
     }
 
