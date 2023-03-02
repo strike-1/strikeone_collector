@@ -57,7 +57,7 @@ cd ./"$folder"
 DC_PROJECT="$folder"
 
 cd ..
-sudo horsec start -p $DC_PROJECT -o json -O ./report-horusec-$SO_TEST_ID.json
+sudo horusec start -p $DC_PROJECT -o json -O ./report-horusec-$SO_TEST_ID.json
 
 
 # remove repo
