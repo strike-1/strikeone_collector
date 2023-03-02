@@ -69,6 +69,19 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
             res = p.communicate()
             return res
 
+        if tool == 'horusec':
+            if 'project_url' not in tool_data or tool_data['project_url'] is None:
+                raise ValueError("project_url field doesn't exist.")
+            
+            if 'project_name' not in tool_data or tool_data['project_name'] is None:
+                raise ValueError("project_name field doesn't exist.")
+            
+
+            command = f"sudo sh run_horusec.sh {tool_data['project_url']} {tool_data['project_name']} {userId} {testId}"    
+            p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+            res = p.communicate()
+            return res
+
     except BaseException as err:
         print('Error occurred during test!\n', err)
         raise err
