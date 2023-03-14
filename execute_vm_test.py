@@ -39,7 +39,7 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
                 raise ValueError("project_name field doesn't exist.")
             
 
-            command = f"sudo sh run_dep_check.sh {tool_data['project_url']} {tool_data['project_name']} {userId} {testId}"    
+            command = f"sudo sh run_dep_check.sh '{tool_data['project_url']}' {tool_data['project_name']} {userId} {testId} {tool_data['curl']}"    
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             res = p.communicate()
             print (res)
@@ -64,7 +64,7 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
                 raise ValueError("project_name field doesn't exist.")
             
 
-            command = f"sudo sh run_gitleaks.sh {tool_data['project_url']} {tool_data['project_name']} {userId} {testId}"    
+            command = f"sudo sh run_gitleaks.sh '{tool_data['project_url']}' {tool_data['project_name']} {userId} {testId} {tool_data['curl']}"    
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             res = p.communicate()
             return res
@@ -77,7 +77,26 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
                 raise ValueError("project_name field doesn't exist.")
             
 
-            command = f"sudo sh run_horusec.sh {tool_data['project_url']} {tool_data['project_name']} {userId} {testId}"    
+            command = f"sudo sh run_horusec.sh '{tool_data['project_url']}' {tool_data['project_name']} {userId} {testId} {tool_data['curl']}"    
+            p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+            res = p.communicate()
+            return res
+        
+        if tool == 'sonarqube':
+            if 'project_url' not in tool_data or tool_data['project_url'] is None:
+                raise ValueError("project_url field doesn't exist.")
+            
+            if 'project_name' not in tool_data or tool_data['project_name'] is None:
+                raise ValueError("project_name field doesn't exist.")
+            
+            if 'sonarqube_token' not in tool_data or tool_data['sonarqube_token'] is None:
+                raise ValueError("sonarqube_token field doesn't exist.")
+            
+            if 'sonarqube_address' not in tool_data or tool_data['sonarqube_address'] is None:
+                raise ValueError("sonarqube_address field doesn't exist.")
+            
+
+            command = f"sudo sh run_sonarscanner.sh '{tool_data['project_url']}' {tool_data['project_name']} {tool_data['sonarqube_token']} {tool_data['sonarqube_address']} {userId} {testId} {tool_data['curl']}"    
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             res = p.communicate()
             return res
@@ -94,19 +113,27 @@ if __name__ == "__main__":
     parser.add_argument("-d", "-tid", "--testid", help = "testid for report filename", required = "true")
     parser.add_argument("-u", "--urls", help = "urls to scan", nargs='+', required = "true")
 
-    # DEPENDENCY CHECK, GIT LEAKS
+    # DEPENDENCY CHECK, GIT LEAKS, SONARQUBE, HORUSEC
     parser.add_argument("-pu", "--projecturl", help = "project/repo url to clone")
     parser.add_argument("-pn", "--projectname", help = "project/repo name, needed to read repo contents")
+    parser.add_argument("-c", "--curl", help = "use curl instead of git clone (certain tools only) can be true/false")
+
+    # SONARQUBE (SONARSCANNER)
+    parser.add_argument("-sut", "--sonartoken", help = "sonarqube user token for authentication")
+    parser.add_argument("-sad", "--sonaraddress", help = "sonarqube instance address and port (i.e 127.0.0.1:9000)")
 
     # NUCLEI
     parser.add_argument("-nts", "--nucleitemplates", help = "nuclei templates to use")
 
     args = parser.parse_args()
-
+    
     tool_data = {
         "project_url": args.projecturl,
         "project_name": args.projectname,
-        "templates": args.nucleitemplates
+        "sonarqube_token": args.sonartoken,
+        "sonarqube_address": args.sonaraddress,
+        "templates": args.nucleitemplates,
+        "curl": args.curl
     }
 
     # EXECUTE SCRIPT

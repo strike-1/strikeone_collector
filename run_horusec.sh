@@ -5,6 +5,7 @@ PROJECT_URL=$1
 PROJECT_NAME=$2
 SO_USER_ID=$3
 SO_TEST_ID=$4
+USE_CURL=$5
 URL=""
 
 if [ -z "$1" ]; then
@@ -27,6 +28,10 @@ if [ -z "$4" ]; then
     exit 22
 fi
 
+if [ -z "$5" ] || [ "$5" != "true" ]; then
+    USE_CURL="false" 
+fi
+
 # PLATFORM REPOSITORY
 URL="$PROJECT_URL"
 
@@ -46,7 +51,12 @@ if [ -d "${PWD}/reports/gitleaks/$SO_USER_ID/$folder" ]; then
 fi 
 
 cd "${PWD}"/reports/horusec/$SO_USER_ID
-git clone "$URL"
+# Use clone or curl
+if [ "$5" = "true" ]; then
+    curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip ./$folder.zip
+else
+    git clone "$URL"
+fi
 
 if [ ! -d "${PWD}/$folder" ]; then
     echo "Repo wasn't cloned properly. Exiting."
@@ -62,4 +72,7 @@ sudo horusec start -p $DC_PROJECT -o json -O ./report-horusec-$SO_TEST_ID.json -
 
 # remove repo
 echo "Removing $folder"
+if [ "$5" = "true" ]; then
+    sudo rm ./"$folder".zip
+fi
 sudo rm -r ./"$folder"

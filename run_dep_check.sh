@@ -6,6 +6,7 @@ PROJECT_URL=$1
 PROJECT_NAME=$2
 SO_USER_ID=$3
 SO_TEST_ID=$4
+USE_CURL=$5
 DATA_DIRECTORY="$DC_DIRECTORY/data"
 CACHE_DIRECTORY="$DC_DIRECTORY/data/cache"
 URL=""
@@ -28,6 +29,10 @@ fi
 if [ -z "$4" ]; then
     echo "SO_TEST_ID (4) argument is required."
     exit 22
+fi
+
+if [ -z "$5" ] || [ "$5" != "true" ]; then
+    USE_CURL="false" 
 fi
 
 if [ ! -d "$DATA_DIRECTORY" ]; then
@@ -58,7 +63,12 @@ if [ -d "${PWD}/reports/dep_check/$SO_USER_ID/$folder" ]; then
 fi 
 
 cd "${PWD}"/reports/dep_check/$SO_USER_ID
-git clone "$URL"
+# Use clone or curl
+if [ "$5" = "true" ]; then
+    curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip ./$folder.zip
+else
+    git clone "$URL"
+fi
 
 if [ ! -d "${PWD}/$folder" ]; then
     echo "Repo wasn't cloned properly. Exiting."
