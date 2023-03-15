@@ -64,7 +64,7 @@ fi
 cd "${PWD}"/reports/gitleaks/$SO_USER_ID
 # Use clone or curl
 if [ "$5" = "true" ]; then
-    curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip ./$folder.zip
+    curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip -o ./$folder.zip -d ./$folder
 else
     git clone "$URL"
 fi
@@ -84,4 +84,7 @@ sudo gitleaks detect -s $DC_PROJECT -v -r ./report-gitleaks-$SO_TEST_ID.json
 
 # remove repo
 echo "Removing $folder"
+if [ "$5" = "true" ]; then
+    sudo rm ./"$folder".zip
+fi
 sudo rm -r ./"$folder"

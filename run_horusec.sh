@@ -53,7 +53,7 @@ fi
 cd "${PWD}"/reports/horusec/$SO_USER_ID
 # Use clone or curl
 if [ "$5" = "true" ]; then
-    curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip ./$folder.zip
+    curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip -o ./$folder.zip -d ./$folder
 else
     git clone "$URL"
 fi
