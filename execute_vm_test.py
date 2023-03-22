@@ -42,7 +42,6 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
             command = f"sudo sh run_dep_check.sh '{tool_data['project_url']}' {tool_data['project_name']} {userId} {testId} {tool_data['curl']}"    
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             res = p.communicate()
-            print (res)
 
             return res
     
