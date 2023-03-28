@@ -80,7 +80,7 @@ DC_PROJECT="$folder"
 
 sudo docker pull sonarsource/sonar-scanner-cli:$DC_VERSION
 sudo docker run --rm \
-    -e SONAR_HOST_URL="http://$SONARQUBE_ADDRESS" \
+    -e SONAR_HOST_URL="$SONARQUBE_ADDRESS" \
     -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=$PROJECT_NAME" \
     -e SONAR_LOGIN="$SONARQUBE_TOKEN" \
     -v "${PWD}:/usr/src" \
