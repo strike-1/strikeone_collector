@@ -95,7 +95,7 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
                 raise ValueError("sonarqube_address field doesn't exist.")
             
 
-            command = f"sudo sh run_sonarscanner.sh '{tool_data['project_url']}' {tool_data['project_name']} {tool_data['sonarqube_token']} '{tool_data['sonarqube_address']}' {userId} {testId} {tool_data['curl']}"    
+            command = f"sudo sh run_sonarscanner.sh '{tool_data['project_url']}' '{tool_data['project_name']}' '{tool_data['sonarqube_token']}' '{tool_data['sonarqube_address']}' {userId} {testId} {tool_data['curl']}"    
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             res = p.communicate()
             return res
