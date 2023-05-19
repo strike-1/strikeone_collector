@@ -10,7 +10,7 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
 
     try:
 
-        print("Beginning test process...\n")
+        print(f"[COLLECTOR] Beginning test using {tool}... \n")
 
         if tool == 'openvas':
             gvmResults = list()
@@ -101,7 +101,7 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
             return res
 
     except BaseException as err:
-        print('Error occurred during test!\n', err)
+        print(f"[COLLECTOR] An error has occurred during test execution!\n[ERROR] {err}")
         raise err
 
 if __name__ == "__main__":
@@ -137,3 +137,4 @@ if __name__ == "__main__":
 
     # EXECUTE SCRIPT
     main(args.userid, args.tool, args.testid, args.urls, tool_data)
+    print("[COLLECTOR] Test finished.")

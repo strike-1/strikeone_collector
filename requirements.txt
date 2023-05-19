@@ -1,3 +1,2 @@
-colorama==0.4.3
-python-gvm==21.11.0
+python-gvm==21.1.0
 bson==0.5.10

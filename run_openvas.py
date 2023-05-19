@@ -37,9 +37,9 @@ def execute_gvm_scan(target: str, userId: str, testId: str):
         gmp.authenticate(username, password)
 
         version = gmp.get_version()
-        print(f"Greenbone OS | Openvas v{ version.find('version').text }")
+        print(f"[OPENVAS] Greenbone OS | OpenVAS v{ version.find('version').text }")
 
-        print(f"Target to scan - {target}")
+        print(f"[OPENVAS] Beginning scan on {target}...")
 
         # CREATE TARGET IF NOT EXIST
         target_to_scan = target
@@ -52,17 +52,20 @@ def execute_gvm_scan(target: str, userId: str, testId: str):
         if target_to_scan.endswith("/"):
             target_to_scan = target_to_scan[:-1]
 
+        print(f"[OPENVAS] Creating target for {target}...")
         targetId = create_target(gmp, target_to_scan)
 
         # CREATE TASK AND START SCAN
+        print(f"[OPENVAS] Creating task for {target}...")
         task = create_task(gmp, testId, targetId)
         queued_task = gmp.start_task(task.attrib['id'])
 
         # GET CURRENT REPORT FROM THE TASK
+        print(f"[OPENVAS] Getting report for {target}...")
         report = gmp.get_report(queued_task.find('report_id').text)
         result = recursive_dict(report)
 
-        # INSERT REQUESTED REPORT ON MONGO
+        # GET SCAN DATA
         scan_data = GvmScan(
             queued_task.find('report_id').text, 
             result['report']['report']['scan_run_status'],
@@ -76,7 +79,7 @@ def execute_gvm_scan(target: str, userId: str, testId: str):
 
         check_dir = os.path.isdir(f"/opt/scanone/vuln-management/reports/openvas/{userId}")
         if not check_dir:
-            print("User directory doesn't exist, creating")
+            print("[OPENVAS] User directory doesn't exist, creating...")
 
             md_cmd = f"mkdir -p /opt/scanone/vuln-management/reports/openvas/{userId}"
             md_p = subprocess.Popen(md_cmd, stdout=subprocess.PIPE, shell=True)
@@ -86,10 +89,12 @@ def execute_gvm_scan(target: str, userId: str, testId: str):
             json.dump(scan_data.__dict__, outfile)
 
 
+        print(f"[OPENVAS] Scan has been started successfully.")
         return scan_data.__dict__
         
 
     except GvmError as error:
+        print(f"[OPENVAS] An error has occurred.")
         raise error
 
 
@@ -104,7 +109,7 @@ def create_target(gmp: Gmp, target: str):
         if item.find('name').text == target:
             targetExist = True
             targetId = item.attrib['id']
-            print(f"target { target } exists: { targetExist }")
+            print(f"[OPENVAS] { target } already exists as a target.")
             break
 
     if not targetExist:
@@ -116,7 +121,7 @@ def create_target(gmp: Gmp, target: str):
         )
 
         targetId = new_target.attrib['id']
-        print("target created")
+        print(f"[OPENVAS] Target created.")
     
     return targetId
 
@@ -131,6 +136,8 @@ def create_task(gmp: Gmp, testId: str, targetId: str):
         target_id=targetId,
         scanner_id=scanner_id
     )
+
+    print(f"[OPENVAS] Task created.")
     return new_task
 
 

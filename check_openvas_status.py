@@ -7,8 +7,6 @@ from gvm.connections import TLSConnection
 from gvm.protocols.latest import Gmp
 from gvm.transforms import EtreeCheckCommandTransform
 
-from colorama import Fore
-
 os.chdir("/opt/scanone/vuln-management/")
 config_file = configparser.ConfigParser()
 config_file.read("config.ini")
@@ -34,16 +32,16 @@ if __name__ == "__main__":
         with Gmp(connection=gvmConnection, transform=transform) as gmp:
             try: 
 
-                print(f"{Fore.GREEN}Attempting OpenVAS authentication...")
+                print(f"[OPENVAS] Attempting OpenVAS authentication...")
 
                 gmp.authenticate(username, password)
 
                 version = gmp.get_version()
-                print(f"Greenbone OS | OpenVAS v{ version.find('version').text }")
-                print(f"{Fore.WHITE}Authenticated successfully.")
+                print(f"[OPENVAS] Greenbone OS | OpenVAS v{ version.find('version').text }")
+                print(f"[OPENVAS]  Authenticated successfully.")
 
             except BaseException as error:
-                print(f'{Fore.RED}Failed to authenticate.\n{str(error)}', file=sys.stderr)
+                print(f'[OPENVAS] Failed to authenticate.\n{str(error)}', file=sys.stderr)
 
     except BaseException as connError:
-        print(f'{Fore.RED}Failed to establish connection.\n{str(connError)}', file=sys.stderr)
+        print(f'[OPENVAS] Failed to establish connection to OpenVAS.\n{str(connError)}', file=sys.stderr)

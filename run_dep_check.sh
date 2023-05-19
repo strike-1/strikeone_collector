@@ -12,22 +12,22 @@ CACHE_DIRECTORY="$DC_DIRECTORY/data/cache"
 URL=""
 
 if [ -z "$1" ]; then
-    echo "PROJECT_URL (1) argument is required."
+    echo "[OWASP DEP CHECK] PROJECT_URL (1) argument is required."
     exit 22
 fi
 
 if [ -z "$2" ]; then
-    echo "PROJECT_NAME (2) argument is required."
+    echo "[OWASP DEP CHECK] PROJECT_NAME (2) argument is required."
     exit 22
 fi
 
 if [ -z "$3" ]; then
-    echo "SO_USER_ID (3) argument is required."
+    echo "[OWASP DEP CHECK] SO_USER_ID (3) argument is required."
     exit 22
 fi
 
 if [ -z "$4" ]; then
-    echo "SO_TEST_ID (4) argument is required."
+    echo "[OWASP DEP CHECK] SO_TEST_ID (4) argument is required."
     exit 22
 fi
 
@@ -36,11 +36,11 @@ if [ -z "$5" ] || [ "$5" != "true" ]; then
 fi
 
 if [ ! -d "$DATA_DIRECTORY" ]; then
-    echo "Initially creating persistent directory: $DATA_DIRECTORY"
+    echo "[OWASP DEP CHECK] Creating persistent directory: $DATA_DIRECTORY"
     mkdir -p "$DATA_DIRECTORY"
 fi
 if [ ! -d "$CACHE_DIRECTORY" ]; then
-    echo "Initially creating persistent directory: $CACHE_DIRECTORY"
+    echo "[OWASP DEP CHECK] Creating persistent directory: $CACHE_DIRECTORY"
     mkdir -p "$CACHE_DIRECTORY"
 fi
 
@@ -48,9 +48,9 @@ fi
 URL="$PROJECT_URL"
 
 if [ -d "${PWD}/reports/dep_check/$SO_USER_ID" ]; then
-    echo "Reports folder already exists."
+    echo "[OWASP DEP CHECK] Reports folder already exists."
 else
-    echo "Reports folder doesn't exist. Creating..."
+    echo "[OWASP DEP CHECK] Reports folder doesn't exist. Creating..."
     sudo mkdir -p "${PWD}"/reports/dep_check/$SO_USER_ID
 fi
 
@@ -58,31 +58,34 @@ fi
 folder=$PROJECT_NAME
 
 if [ -d "${PWD}/reports/dep_check/$SO_USER_ID/$folder" ]; then
-    echo 'Folder already exists, deleting...'
+    echo '[OWASP DEP CHECK] Folder already exists, deleting...'
     sudo rm -r "${PWD}"/reports/dep_check/$SO_USER_ID/$folder
 fi 
 
 cd "${PWD}"/reports/dep_check/$SO_USER_ID
 # Use clone or curl
 if [ "$5" = "true" ]; then
+    echo "[OWASP DEP CHECK] Running curl..."
     curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip -o ./$folder.zip -d ./$folder
 else
+    echo "[OWASP DEP CHECK] Cloning repo..."
     git clone "$URL"
 fi
 
 if [ ! -d "${PWD}/$folder" ]; then
-    echo "Repo wasn't cloned properly. Exiting."
+    echo "[OWASP DEP CHECK] Repo wasn't cloned properly. Exiting."
     exit 2
 fi 
 cd ./"$folder"
 
 # run yarn to install modules
-echo "Running yarn..."
+echo "[OWASP DEP CHECK] Running yarn..."
 yarn
 
 DC_PROJECT="$folder"
 
 cd ..
+echo "[OWASP DEP CHECK] Running Docker..."
 sudo docker pull owasp/dependency-check:$DC_VERSION
 sudo docker run --rm \
     -e user=$USER \
@@ -98,6 +101,10 @@ sudo docker run --rm \
 
 # remove repo
 if [ "$5" = "true" ]; then
+    echo "[OWASP DEP CHECK] Removing repo zip file..."
     sudo rm ./"$folder".zip
 fi
+echo "[OWASP DEP CHECK] Removing repo folder..."
 sudo rm -r ./"$folder"
+
+echo "[OWASP DEP CHECK] Dependency check completed."

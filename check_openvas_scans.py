@@ -8,8 +8,6 @@ from gvm.connections import TLSConnection
 from gvm.protocols.latest import Gmp
 from gvm.transforms import EtreeCheckCommandTransform
 
-from colorama import Fore
-
 os.chdir("/opt/scanone/vuln-management/")
 config_file = configparser.ConfigParser()
 config_file.read("config.ini")
@@ -81,23 +79,24 @@ if __name__ == "__main__":
             test_id = str(args.testid)
             user_id = str(args.userid)
 
-            print(f"{Fore.GREEN}Running OpenVAS Scan Check for Test {test_id}")
+            print(f"[OPENVAS] Running OpenVAS Scan Check for Test {test_id}.")
 
             gmp.authenticate(username, password)
 
             version = gmp.get_version()
-            print(f"Greenbone OS | OpenVAS v{ version.find('version').text }")
+            print(f"[OPENVAS] Greenbone OS | OpenVAS v{ version.find('version').text }")
 
             # GET CURRENT REPORT JSON
             for file in os.listdir(f"/opt/scanone/vuln-management/reports/openvas/{user_id}"):
                 if test_id in file:
+                    print(f"[OPENVAS] Report for test ${test_id} found.")
                     os.chdir(f"/opt/scanone/vuln-management/reports/openvas/{user_id}")
                     open_file = open(file)
 
                     json_content = json.load(open_file)
                     report_data = gmp.get_report(json_content['reportId'], details=True, filter_string='apply_overrides=0 levels=hmlg min_qod=0 rows=1000 first=1 sort-reverse=severity')
                     report_dict = recursive_dict(report_data)['report']['report']
-                    print(f"{Fore.LIGHTBLUE_EX}Report: {json_content['reportId']} - {report_dict['scan_run_status']} - {report_dict['task']['progress']} %")
+                    print(f"[OPENVAS] Report: {json_content['reportId']} - {report_dict['scan_run_status']} - {report_dict['task']['progress']} %")
 
                     scan_data = GvmScan(
                         json_content['reportId'], 
@@ -107,10 +106,11 @@ if __name__ == "__main__":
                     )
 
                     with open(f"/opt/scanone/vuln-management/reports/openvas/{user_id}/{file}", "w") as outfile:
+                        print(f"[OPENVAS] Opening OpenVAS report and dumping output...")
                         json.dump(scan_data.__dict__, outfile)
 
         except BaseException as error:
-            print(f'{Fore.RED}Error occurred on OpenVAS Scan Check\n{str(error)}', file=sys.stderr)
+            print(f'[OPENVAS] An error has occurred while checking OpenVAS scans.\n{str(error)}', file=sys.stderr)
 
 
       
