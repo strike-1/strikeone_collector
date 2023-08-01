@@ -3,9 +3,10 @@
 DC_DIRECTORY=$HOME/GITLEAKS
 PROJECT_URL=$1
 PROJECT_NAME=$2
-SO_USER_ID=$3
-SO_TEST_ID=$4
-USE_CURL=$5
+PROJECT_BRANCH=$3
+SO_USER_ID=$4
+SO_TEST_ID=$5
+USE_CURL=$6
 DATA_DIRECTORY="$DC_DIRECTORY/data"
 CACHE_DIRECTORY="$DC_DIRECTORY/data/cache"
 URL=""
@@ -21,16 +22,21 @@ if [ -z "$2" ]; then
 fi
 
 if [ -z "$3" ]; then
-    echo "[GITLEAKS] SO_USER_ID (3) argument is required."
+    echo "[GITLEAKS] PROJECT_BRANCH (3) argument is required."
     exit 22
 fi
 
 if [ -z "$4" ]; then
-    echo "[GITLEAKS] SO_TEST_ID (4) argument is required."
+    echo "[GITLEAKS] SO_USER_ID (4) argument is required."
     exit 22
 fi
 
-if [ -z "$5" ] || [ "$5" != "true" ]; then
+if [ -z "$5" ]; then
+    echo "[GITLEAKS] SO_TEST_ID (5) argument is required."
+    exit 22
+fi
+
+if [ -z "$6" ] || [ "$6" != "true" ]; then
     USE_CURL="false" 
 fi
 
@@ -63,12 +69,12 @@ fi
 
 cd "${PWD}"/reports/gitleaks/$SO_USER_ID
 # Use clone or curl
-if [ "$5" = "true" ]; then
+if [ "$6" = "true" ]; then
     echo "[GITLEAKS] Running curl..."
     curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip -o ./$folder.zip -d ./$folder
 else
-    echo "[GITLEAKS] Cloning repo..."
-    git clone "$URL"
+    echo "[GITLEAKS] Cloning repo using "$PROJECT_BRANCH" branch..."
+    git clone --branch "$PROJECT_BRANCH" "$URL"
 fi
 
 
@@ -86,7 +92,7 @@ sudo gitleaks detect -s $DC_PROJECT -v -r ./report-gitleaks-$SO_TEST_ID.json
 
 
 # remove repo
-if [ "$5" = "true" ]; then
+if [ "$6" = "true" ]; then
     echo "[GITLEAKS] Removing repo zip file..."
     sudo rm ./"$folder".zip
 fi

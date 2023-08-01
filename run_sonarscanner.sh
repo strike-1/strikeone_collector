@@ -3,11 +3,12 @@
 DC_VERSION="latest"
 PROJECT_URL=$1
 PROJECT_NAME=$2
-SONARQUBE_TOKEN=$3
-SONARQUBE_ADDRESS=$4
-SO_USER_ID=$5
-SO_TEST_ID=$6
-USE_CURL=$7
+PROJECT_BRANCH=$3
+SONARQUBE_TOKEN=$4
+SONARQUBE_ADDRESS=$5
+SO_USER_ID=$6
+SO_TEST_ID=$7
+USE_CURL=$8
 URL=""
 
 if [ -z "$1" ]; then
@@ -21,26 +22,31 @@ if [ -z "$2" ]; then
 fi
 
 if [ -z "$3" ]; then
-    echo "[SONARSCANNER] SONARQUBE_TOKEN (3) argument is required."
+    echo "[SONARSCANNER] PROJECT_BRANCH (3) argument is required."
     exit 22
 fi
 
 if [ -z "$4" ]; then
-    echo "[SONARSCANNER] SONARQUBE_ADDRESS (4) argument is required."
+    echo "[SONARSCANNER] SONARQUBE_TOKEN (4) argument is required."
     exit 22
 fi
 
 if [ -z "$5" ]; then
-    echo "[SONARSCANNER] SO_USER_ID (5) argument is required."
+    echo "[SONARSCANNER] SONARQUBE_ADDRESS (5) argument is required."
     exit 22
 fi
 
 if [ -z "$6" ]; then
-    echo "[SONARSCANNER] SO_TEST_ID (6) argument is required."
+    echo "[SONARSCANNER] SO_USER_ID (6) argument is required."
     exit 22
 fi
 
-if [ -z "$7" ] || [ "$7" != "true" ]; then
+if [ -z "$7" ]; then
+    echo "[SONARSCANNER] SO_TEST_ID (7) argument is required."
+    exit 22
+fi
+
+if [ -z "$8" ] || [ "$8" != "true" ]; then
     USE_CURL="false" 
 fi
 
@@ -64,12 +70,12 @@ fi
 
 cd "${PWD}"/reports/sonarscanner/$SO_USER_ID
 # Use clone or curl
-if [ "$7" = "true" ]; then
+if [ "$8" = "true" ]; then
     echo "[SONARSCANNER] Running curl..."
     curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip -o ./$folder.zip -d ./$folder
 else
-    echo "[SONARSCANNER] Cloning repo..."
-    git clone "$URL"
+    echo "[SONARSCANNER] Cloning repo using "$PROJECT_BRANCH" branch..."
+    git clone --branch "$PROJECT_BRANCH" "$URL"
 fi
 
 if [ ! -d "${PWD}/$folder" ]; then
@@ -91,7 +97,7 @@ sudo docker run --rm \
 
 # remove repo
 cd ..
-if [ "$7" = "true" ]; then
+if [ "$8" = "true" ]; then
     echo "[SONARSCANNER] Removing repo zip file..."
     sudo rm ./"$folder".zip
 fi

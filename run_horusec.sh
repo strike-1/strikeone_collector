@@ -3,9 +3,10 @@
 DC_DIRECTORY=$HOME/HORUSEC
 PROJECT_URL=$1
 PROJECT_NAME=$2
-SO_USER_ID=$3
-SO_TEST_ID=$4
-USE_CURL=$5
+PROJECT_BRANCH=$3
+SO_USER_ID=$4
+SO_TEST_ID=$5
+USE_CURL=$6
 URL=""
 
 if [ -z "$1" ]; then
@@ -19,16 +20,21 @@ if [ -z "$2" ]; then
 fi
 
 if [ -z "$3" ]; then
-    echo "[HORUSEC] SO_USER_ID (3) argument is required."
+    echo "[HORUSEC] PROJECT_BRANCH (3) argument is required."
     exit 22
 fi
 
 if [ -z "$4" ]; then
-    echo "[HORUSEC] SO_TEST_ID (4) argument is required."
+    echo "[HORUSEC] SO_USER_ID (4) argument is required."
     exit 22
 fi
 
-if [ -z "$5" ] || [ "$5" != "true" ]; then
+if [ -z "$5" ]; then
+    echo "[HORUSEC] SO_TEST_ID (5) argument is required."
+    exit 22
+fi
+
+if [ -z "$6" ] || [ "$6" != "true" ]; then
     USE_CURL="false" 
 fi
 
@@ -52,12 +58,12 @@ fi
 
 cd "${PWD}"/reports/horusec/$SO_USER_ID
 # Use clone or curl
-if [ "$5" = "true" ]; then
+if [ "$6" = "true" ]; then
     echo "[HORUSEC] Running curl..."
     curl --request GET --header "Accept: application/zip" --output "./$folder.zip" "$URL" && unzip -o ./$folder.zip -d ./$folder
 else
-    echo "[HORUSEC] Cloning repo..."
-    git clone "$URL"
+    echo "[HORUSEC] Cloning repo using "$PROJECT_BRANCH" branch..."
+    git clone --branch "$PROJECT_BRANCH" "$URL"
 fi
 
 if [ ! -d "${PWD}/$folder" ]; then
@@ -74,7 +80,7 @@ sudo horusec start -p $DC_PROJECT -o json -O ./report-horusec-$SO_TEST_ID.json -
 
 
 # remove repo
-if [ "$5" = "true" ]; then
+if [ "$6" = "true" ]; then
     echo "[HORUSEC] Removing repo zip file..."
     sudo rm ./"$folder".zip
 fi
