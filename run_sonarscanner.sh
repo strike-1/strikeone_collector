@@ -9,6 +9,7 @@ SONARQUBE_ADDRESS=$5
 SO_USER_ID=$6
 SO_TEST_ID=$7
 USE_CURL=$8
+EXCLUSIONS=$9
 URL=""
 
 if [ -z "$1" ]; then
@@ -47,7 +48,7 @@ if [ -z "$7" ]; then
 fi
 
 if [ -z "$8" ] || [ "$8" != "true" ]; then
-    USE_CURL="false" 
+    USE_CURL="false"
 fi
 
 # PLATFORM REPOSITORY
@@ -66,7 +67,7 @@ folder=$PROJECT_NAME
 if [ -d "${PWD}/reports/sonarscanner/$SO_USER_ID/$folder" ]; then
     echo '[SONARSCANNER] Folder already exists, deleting...'
     sudo rm -r "${PWD}"/reports/sonarscanner/$SO_USER_ID/$folder
-fi 
+fi
 
 cd "${PWD}"/reports/sonarscanner/$SO_USER_ID
 # Use clone or curl
@@ -81,19 +82,33 @@ fi
 if [ ! -d "${PWD}/$folder" ]; then
     echo "[SONARSCANNER] Repo wasn't cloned properly. Exiting."
     exit 2
-fi 
+fi
 cd ./"$folder"
 
 DC_PROJECT="$folder"
 
 echo "[SONARSCANNER] Running Docker..."
 sudo docker pull sonarsource/sonar-scanner-cli:$DC_VERSION
-sudo docker run --rm \
-    -e SONAR_HOST_URL="$SONARQUBE_ADDRESS" \
-    -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=$PROJECT_NAME" \
-    -e SONAR_LOGIN="$SONARQUBE_TOKEN" \
-    -v "${PWD}:/usr/src" \
-    sonarsource/sonar-scanner-cli
+
+if [ -n "$9" ]; then
+    echo "[SONARSCANNER] SonarQube Scan have exclusions (9)"
+    sudo docker run --rm \
+        -e SONAR_HOST_URL="$SONARQUBE_ADDRESS" \
+        -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=$PROJECT_NAME -Dsonar.exclusions=$EXCLUSIONS" \
+        -e SONAR_LOGIN="$SONARQUBE_TOKEN" \
+        -v "${PWD}:/usr/src" \
+        sonarsource/sonar-scanner-cli
+fi
+
+if [ -z "$9" ]; then
+    sudo docker run --rm \
+        -e SONAR_HOST_URL="$SONARQUBE_ADDRESS" \
+        -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=$PROJECT_NAME" \
+        -e SONAR_LOGIN="$SONARQUBE_TOKEN" \
+        -v "${PWD}:/usr/src" \
+        sonarsource/sonar-scanner-cli
+
+fi
 
 # remove repo
 cd ..
