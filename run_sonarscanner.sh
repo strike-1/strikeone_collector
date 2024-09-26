@@ -95,7 +95,7 @@ if [ -n "$9" ]; then
     sudo docker run --rm \
         -e SONAR_HOST_URL="$SONARQUBE_ADDRESS" \
         -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=$PROJECT_NAME -Dsonar.exclusions=$EXCLUSIONS" \
-        -e SONAR_LOGIN="$SONARQUBE_TOKEN" \
+        -e SONAR_TOKEN="$SONARQUBE_TOKEN" \
         -v "${PWD}:/usr/src" \
         sonarsource/sonar-scanner-cli
 fi
@@ -104,7 +104,7 @@ if [ -z "$9" ]; then
     sudo docker run --rm \
         -e SONAR_HOST_URL="$SONARQUBE_ADDRESS" \
         -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=$PROJECT_NAME" \
-        -e SONAR_LOGIN="$SONARQUBE_TOKEN" \
+        -e SONAR_TOKEN="$SONARQUBE_TOKEN" \
         -v "${PWD}:/usr/src" \
         sonarsource/sonar-scanner-cli
 
