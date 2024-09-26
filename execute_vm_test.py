@@ -107,7 +107,7 @@ def main(userId: str, tool: str, testId: str, urls: List[str], tool_data: Option
                 raise ValueError("sonarqube_address field doesn't exist.")
             
 
-            command = f"sudo sh run_sonarscanner.sh '{tool_data['project_url']}' '{tool_data['project_name']}' '{tool_data['project_branch']}' '{tool_data['sonarqube_token']}' '{tool_data['sonarqube_address']}' {userId} {testId} {tool_data['curl']}"    
+            command = f"sudo sh run_sonarscanner.sh '{tool_data['project_url']}' '{tool_data['project_name']}' '{tool_data['project_branch']}' '{tool_data['sonarqube_token']}' '{tool_data['sonarqube_address']}' {userId} {testId} {tool_data['curl']} {tool_data['sonarqube_exclusions']}"    
             p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
             res = p.communicate()
             return res
@@ -133,6 +133,7 @@ if __name__ == "__main__":
     # SONARQUBE (SONARSCANNER)
     parser.add_argument("-sut", "--sonartoken", help = "sonarqube user token for authentication")
     parser.add_argument("-sad", "--sonaraddress", help = "sonarqube instance address and port (i.e 127.0.0.1:9000)")
+    parser.add_argument("-se", "--sonarexclusions", help = "sonarqube test exclusions (ex: src/**)")
 
     # NUCLEI
     parser.add_argument("-nts", "--nucleitemplates", help = "nuclei templates to use")
@@ -145,6 +146,7 @@ if __name__ == "__main__":
         "project_branch": args.projectbranch,
         "sonarqube_token": args.sonartoken,
         "sonarqube_address": args.sonaraddress,
+        "sonarqube_exclusions": args.sonarexclusions,
         "templates": args.nucleitemplates,
         "curl": args.curl
     }
